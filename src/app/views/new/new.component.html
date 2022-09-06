@@ -1,0 +1,244 @@
+<div *ngIf="preferences" class="container">
+  <div class="row justify-content-center">
+    <form
+      class="mt-3 col-md-8"
+      (ngSubmit)="onSave(contents, ad)"
+      [formGroup]="userForm"
+    >
+      <div class="form-row">
+        <div class="form-group m-1 form-floating">
+          <input
+            type="text"
+            id="floatingInput"
+            class="form-control text-center"
+            placeholder="Nombre"
+            formControlName="name"
+          />
+          <label for="floatingInput">Nombre</label>
+        </div>
+        <div
+          class="alert alert-dismissible alert-danger m-1"
+          *ngIf="name.invalid && (name.dirty || name.touched)"
+        >
+          <div *ngIf="name.errors.required">Este campo es requerido</div>
+          <div *ngIf="name.errors.minlength">
+            Este campo debe contener mínimo 5 caracteres
+          </div>
+          <div *ngIf="name.errors.pattern">
+            No debe incluir números ni caracteres especiales.
+          </div>
+        </div>
+        <div class="form-group m-1 form-floating">
+          <input
+            type="text"
+            id="floatingInput1"
+            class="form-control text-center"
+            placeholder="Descripción"
+            formControlName="descr"
+          />
+          <label for="floatingInput1">Descripción</label>
+        </div>
+        <div
+          class="alert alert-dismissible alert-danger m-1"
+          *ngIf="descr.invalid && (descr.dirty || descr.touched)"
+        >
+          <div *ngIf="descr.errors.required">Este campo es requerido</div>
+          <div *ngIf="descr.errors.minlength">
+            Este campo debe contener mínimo 5 caracteres
+          </div>
+        </div>
+
+        <div class="form-group m-1 form-floating">
+          <input
+            type="text"
+            id="floatingInput2"
+            class="form-control text-center"
+            placeholder="Email"
+            formControlName="email"
+          />
+          <label for="floatingInput2">Correo Electrónico</label>
+        </div>
+        <div
+          class="alert alert-dismissible alert-danger m-1"
+          *ngIf="email.invalid && (email.dirty || email.touched)"
+        >
+          <div *ngIf="email.errors.required">Este campo es requerido</div>
+          <div
+            *ngIf="
+              (email.dirty || email.touched) &&
+              email.invalid &&
+              email.errors.pattern
+            "
+          >
+            Debe ingresar un correo electrónico válido: ejemplo@gmail.com
+          </div>
+        </div>
+        <div class="form-group m-1 form-floating">
+          <select
+            class="form-select text-center"
+            id="exampleSelect1"
+            formControlName="role"
+          >
+            <option>EMPLEADO</option>
+            <option>ADMINISTRADOR</option>
+          </select>
+          <label for="floatingInput3">Rol de Usuario</label>
+        </div>
+        <div class="form-group m-1 form-floating">
+          <select
+            class="form-select text-center"
+            id="exampleSelect2"
+            formControlName="horario"
+          >
+            <option>Horario Flexible</option>
+            <option>Horario No Flexible</option>
+          </select>
+          <label for="floatingInput3">Horario</label>
+        </div>
+        <ng-container *ngIf="horario.value == 'Horario No Flexible'">
+          <div class="form-group m-1 form-floating">
+            <input
+              type="time"
+              id="floatingInput4"
+              class="form-control"
+              placeholder="horaIn"
+              formControlName="horaIn"
+            />
+            <label for="floatingInput4">Hora de Entrada</label>
+          </div>
+          <div
+            class="alert alert-dismissible alert-danger m-1"
+            *ngIf="horaIn.invalid && (horaIn.dirty || horaIn.touched)"
+          >
+            Debe ingresar una hora válida en formato HH:mm
+          </div>
+          <div class="form-group m-1 form-floating">
+            <input
+              type="time"
+              id="floatingInput5"
+              class="form-control"
+              placeholder="Email"
+              formControlName="horasDeTrabajo"
+            />
+            <label for="floatingInput5">Total de Horas de Trabajo</label>
+          </div>
+          <div
+            class="alert alert-dismissible alert-danger m-1"
+            *ngIf="
+              horasDeTrabajo.invalid &&
+              (horasDeTrabajo.dirty || horasDeTrabajo.touched)
+            "
+          >
+            Debe ingresar una hora válida en formato HH:mm
+          </div>
+        </ng-container>
+        <div class="container">
+          <div class="row justify-content-center m-2">
+            <button
+              type="submit"
+              class="btn bg-dark text-light btn-block"
+              [disabled]="!userForm.valid"
+              *ngIf="!usuarioGuardado"
+            >
+              Guardar
+            </button>
+            <ng-container *ngIf="usuarioGuardado">
+              <div class="text-center">
+                <h3>
+                  Se ha guardado correctamente el usuario, porfavor cree una
+                  contraseña en: "ACTIVAR CUENTA".
+                </h3>
+              </div>
+              <button
+                class="btn bg-dark text-light btn-block"
+                (click)="onClick(contents)"
+              >
+                ACTIVAR CUENTA
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="onGoBackToList()">
+      Regresar
+    </button>
+  </div>
+</div>
+
+<!-- MODALES -->
+
+<ng-template #contents let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">USUARIO GUARDADO CORRECTAMENTE</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="userFormPassword">
+    <div class="modal-body">
+      <p>
+        A continuación debe generar una contraseña para la cuenta del usuario
+        con el correo: {{ emailUsuario }}.
+      </p>
+
+      <div class="form-group m-1 form-floating">
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+        />
+        <label for="floating">Contraseña</label>
+      </div>
+      <div
+        class="alert alert-dismissible alert-danger m-1"
+        *ngIf="password.invalid && (password.dirty || password.touched)"
+      >
+        <div *ngIf="password.errors.required">Este campo es requerido</div>
+        <div *ngIf="password.errors.minlength">
+          Este campo debe contener mínimo 5 caracteres
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onActivate(contents)"
+      [disabled]="!userFormPassword.valid"
+    >
+      ACEPTAR
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>
+
+<ng-template #ad let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">Aviso!</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    {{ this.message }}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.dismiss()">
+      ACEPTAR
+    </button>
+  </div>
+</ng-template>

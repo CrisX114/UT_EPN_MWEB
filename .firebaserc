@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "sca-cdici": {
+      "hosting": {
+        "mweb": [
+          "sca-cdici"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "sca-cdici"
+  }
+}

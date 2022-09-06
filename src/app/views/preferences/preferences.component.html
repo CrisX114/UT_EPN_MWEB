@@ -1,0 +1,406 @@
+<div *ngIf="preferences">
+  <div *ngIf="!editar">
+    <div
+      class="alert alert-dismissible alert-warning"
+      *ngIf="
+        (preferences.puedeCrear ||
+          preferences.puedeActualizar ||
+          preferences.puedeEliminar) &&
+        isAdmin
+      "
+    >
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <h4 class="alert-heading">Advertencia!</h4>
+      <p class="mb-0" *ngIf="preferences.puedeCrear">
+        El Módulo de Recolección de Datos debe registrar un usuario nuevo.
+      </p>
+      <p class="mb-0" *ngIf="preferences.puedeActualizar">
+        El Módulo de Recolección de Datos debe registrar actualizar una huella
+        digital.
+      </p>
+      <p class="mb-0" *ngIf="preferences.puedeEliminar">
+        El Módulo de Recolección de Datos debe eliminar una huella digital de su
+        registro.
+      </p>
+    </div>
+    <div class="card mt-2">
+      <div class="card-header">PREFERENCIAS DEL SISTEMA</div>
+      <div class="container">
+        <ul class="list-group">
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="row">
+                <li class="list-group-item">
+                  Minutos de tolerancia para atrasos de empleados:
+                  <h3>{{ preferences.toleranciaIn }}</h3>
+                </li>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="row">
+                <li class="list-group-item">
+                  Minutos de tolerancia para salida de empleados:
+                  <h3>{{ preferences.toleranciaOut }}</h3>
+                </li>
+              </div>
+            </div>
+          </div>
+          <div class="row text-center">
+            <div class="col-12">
+              <div class="row">
+                <li class="list-group-item">
+                  Hora máxima de entrada:
+                  <h3>
+                    {{ convertString(preferences.horaRegistroFaltas) }}:00
+                  </h3>
+                </li>
+              </div>
+            </div>
+          </div>
+          <ng-container *ngIf="isAdmin">
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="row">
+                  <li class="list-group-item">
+                    ¿Debe crear un usuario?
+                    <ng-container
+                      *ngIf="preferences.puedeCrear; else sinAcciones"
+                    >
+                      <h3>
+                        SI! Debe pulsar el botón de Opciones en el Módulo de
+                        Recolección de Datos
+                      </h3>
+                    </ng-container>
+                  </li>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <li class="list-group-item">
+                    ¿Debe actualizar una huella digital?
+                    <ng-container
+                      *ngIf="preferences.puedeActualizar; else sinAcciones"
+                    >
+                      <h3>
+                        SI! Debe pulsar el botón de Opciones en el Módulo de
+                        Recolección de Datos
+                      </h3>
+                      <button
+                        class="btn btn-outline-info"
+                        (click)="cancelAct(ad)"
+                      >
+                        Cancelar Actualización
+                      </button>
+                    </ng-container>
+                  </li>
+                </div>
+              </div>
+            </div>
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="row">
+                  <li class="list-group-item">
+                    ¿Debe eliminar una huella digital de usuario?
+                    <ng-container
+                      *ngIf="preferences.puedeEliminar; else sinAcciones"
+                    >
+                      <h3>
+                        SI! Debe pulsar el botón de Opciones en el Módulo de
+                        Recolección de Datos
+                      </h3>
+                    </ng-container>
+                  </li>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <li class="list-group-item">
+                    Último Reinicio del Módulo de Recolección de Datos:
+                    <h3>
+                      {{ timeConverter(preferences.timeServer["seconds"], 0) }}
+                    </h3>
+                  </li>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ul>
+      </div>
+      <div class="btn-group" role="group">
+        <button
+          type="button"
+          class="btn btn-outline-warning m-1 btn-m"
+          (click)="onEdit()"
+          *ngIf="isAdmin"
+        >
+          Editar Preferencias del Sistema
+        </button>
+      </div>
+      <div class="btn-group" role="group">
+        <button
+          type="button"
+          class="btn btn-outline-warning m-1 btn-m"
+          (click)="onClickActivate(generateAccount)"
+          *ngIf="isAdmin"
+        >
+          Habilitar una cuenta
+        </button>
+      </div>
+      <div class="btn-group" role="group">
+        <button
+          type="button"
+          class="btn btn-outline-warning m-1 btn-m"
+          (click)="onClickActivate(password)"
+        >
+          Cambiar contraseña
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #sinAcciones>
+    <h3>NO</h3>
+  </ng-template>
+
+  <form
+    class="mt-3 col-md-12 text-center container-fluid"
+    (ngSubmit)="onSave(ad)"
+    [formGroup]="prefForm"
+    *ngIf="editar"
+  >
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group form-floating">
+          <input
+            type="time"
+            id="floatingInputt"
+            class="form-control"
+            formControlName="horaRegistroFaltas"
+          />
+          <label for="floatingInputt">Hora Máximo de Registro de Faltas:</label>
+        </div>
+        <div
+          class="alert alert-dismissible alert-danger"
+          *ngIf="
+            horaRegistroFaltas.invalid &&
+            (horaRegistroFaltas.dirty || horaRegistroFaltas.touched)
+          "
+        >
+          <div *ngIf="horaRegistroFaltas.errors.required">
+            Este campo es requerido
+          </div>
+          <div *ngIf="horaRegistroFaltas.errors.minlength">
+            Este campo debe contener mínimo 5 caracteres
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group form-floating">
+          <input
+            type="number"
+            id="floatingInput1"
+            class="form-control"
+            formControlName="toleranciaIn"
+          />
+          <label for="floatingInput1">Minutos de tolerancia para atrasos</label>
+        </div>
+        <div
+          class="alert alert-dismissible alert-danger"
+          *ngIf="
+            toleranciaIn.invalid && (toleranciaIn.dirty || toleranciaIn.touched)
+          "
+        >
+          <div *ngIf="toleranciaIn.errors.required">
+            Este campo es requerido
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group form-floating">
+          <input
+            type="number"
+            id="floatingInput4"
+            class="form-control"
+            formControlName="toleranciaOut"
+          />
+          <label for="floatingInput4">Minutos de tolerancia para salida</label>
+        </div>
+        <div
+          class="alert alert-dismissible alert-danger"
+          *ngIf="
+            toleranciaOut.invalid &&
+            (toleranciaOut.dirty || toleranciaOut.touched)
+          "
+        >
+          <div *ngIf="toleranciaOut.errors.required">
+            Este campo es requerido
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-group-vertical m-4" role="group" aria-label="Basic example">
+      <button
+        type="submit"
+        class="btn btn-success text-light"
+        [disabled]="!prefForm.valid"
+      >
+        Guardar
+      </button>
+      <button type="button" class="btn bg-dark text-light" (click)="goBack()">
+        Atrás
+      </button>
+    </div>
+  </form>
+</div>
+
+<ng-template #generateAccount let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">GENERAR CUENTA</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="generateEmailPasswordForm">
+    <div class="modal-body">
+      <p>Ingresar el usuario y contraseña del usuario a activar su cuenta.</p>
+
+      <div class="form-group col-md-6 form-floating">
+        <input type="text" class="form-control" formControlName="email" />
+        <label for="floating">Correo Electrónico</label>
+      </div>
+      <div
+        class="alert alert-dismissible alert-danger col-md-6"
+        *ngIf="email.invalid && (email.dirty || email.touched)"
+      >
+        <div *ngIf="email.errors.minLength">Este campo es requerido</div>
+        <div
+          *ngIf="
+            (email.dirty || email.touched) &&
+            email.invalid &&
+            email.errors.pattern
+          "
+        >
+          Debe ingresar un correo electrónico válido: ejemplo@gmail.com
+        </div>
+      </div>
+      <div class="form-group col-md-6 form-floating">
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+        />
+        <label for="floating">Contraseña</label>
+      </div>
+      <div
+        class="alert alert-dismissible alert-danger col-md-6"
+        *ngIf="password.invalid && (password.dirty || password.touched)"
+      >
+        <div *ngIf="password.errors.required">Este campo es requerido</div>
+        <div *ngIf="password.errors.minlength">
+          Este campo debe contener mínimo 5 caracteres
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onActivate(ad)"
+      [disabled]="!generateEmailPasswordForm.valid"
+    >
+      ACEPTAR
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>
+
+<ng-template #password let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">CAMBIAR CONTRASEñA</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="changePasswordForm">
+    <div class="modal-body">
+      <p>Ingrese su nueva contraseña</p>
+
+      <div class="form-group col-md-6 form-floating">
+        <input type="password" class="form-control" formControlName="pass1" />
+        <label for="floating">Ingrese su contraseña</label>
+      </div>
+      <div
+        class="alert alert-dismissible alert-danger col-md-6"
+        *ngIf="pass1.invalid && (pass1.dirty || pass1.touched)"
+      >
+        <div *ngIf="pass1.errors.required">Este campo es requerido</div>
+        <div *ngIf="pass1.errors.minlength">
+          Este campo debe contener mínimo 5 caracteres
+        </div>
+      </div>
+      <div class="form-group col-md-6 form-floating">
+        <input type="password" class="form-control" formControlName="pass2" />
+        <label for="floating">Repita su contraseña</label>
+      </div>
+      <div
+        class="alert alert-dismissible alert-danger col-md-6"
+        *ngIf="pass2.invalid && (pass2.dirty || pass2.touched)"
+      >
+        <div *ngIf="pass2.errors.required">Este campo es requerido</div>
+        <div *ngIf="pass2.errors.minlength">
+          Este campo debe contener mínimo 5 caracteres
+        </div>
+      </div>
+      <div
+        class="alert alert-dismissible alert-danger col-md-6"
+        *ngIf="pass2.value != pass1.value"
+      >
+        Contraseñas no coinciden!!!
+      </div>
+    </div>
+  </form>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onChangePassword(any)"
+      [disabled]="!changePasswordForm.valid"
+    >
+      ACEPTAR
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>
+
+<ng-template #ad let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">Aviso!</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    {{ this.message }}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.dismiss()">
+      ACEPTAR
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,104 @@
+<div *ngIf="preferences" class="container">
+  <div class="row justify-content-center">
+    <div class="card mt-2 col-md-6 p-0">
+      <div class="card-header">Detalles de Usuario</div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            Nombre:
+            <h4>{{ user.name }}</h4>
+          </li>
+          <li class="list-group-item">
+            Correo Electrónico:
+            <h4>{{ user.email }}</h4>
+          </li>
+          <li class="list-group-item">
+            Rol de Usuario:
+            <h4>{{ user.role }}</h4>
+          </li>
+          <ng-container
+            *ngIf="
+              user.horaIn != '00:00' && user.horasDeTrabajo != '00:00';
+              else horarioFlexible
+            "
+          >
+            <li class="list-group-item">
+              Hora de Entrada:
+              <h4>{{ user.horaIn }}</h4>
+            </li>
+            <li class="list-group-item">
+              Horas de Trabajo:
+              <h4>{{ user.horasDeTrabajo }}</h4>
+            </li>
+          </ng-container>
+          <ng-template #horarioFlexible>
+            <li class="list-group-item">
+              Horario de Trabajo:
+              <h4>Horario Flexible</h4>
+            </li>
+          </ng-template>
+          <li class="list-group-item">
+            Huella #:
+            <h4>{{ user.idHuella }}</h4>
+          </li>
+        </ul>
+      </div>
+      <div class="btn-group" role="group">
+        <button
+          type="button"
+          class="btn btn-outline-warning m-1 btn-sm"
+          (click)="onGoToEdit()"
+          [disabled]="
+            preferences.puedeActualizar || preferences.idHuellaAccion != 0
+          "
+        >
+          Editar
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-danger m-1 btn-sm"
+          (click)="openModal(contentsDelete)"
+          [disabled]="
+            preferences.puedeEliminar || preferences.idHuellaAccion != 0
+          "
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-secondary mt-2"
+    (click)="onGoBackToList()"
+  >
+    Atrás
+  </button>
+</div>
+
+<ng-template #contentsDelete let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">ELIMINAR USUARIO</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro/a de eliminar este usuario?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="onGoToDelete()">
+      SI
+    </button>
+    <button type="button" class="btn btn-primary" (click)="modal.dismiss()">
+      NO
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>

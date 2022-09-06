@@ -1,0 +1,231 @@
+<div
+  class="alert alert-dismissible alert-warning"
+  *ngIf="esHorasExtra || esSalidaTemprana || esAtraso || esFalta || sinSalida"
+>
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <h4 class="alert-heading">Advertencia! Debe generar justificación por:</h4>
+  <p class="mb-0" *ngIf="esHorasExtra">
+    Trabajo fuera del horario laboral (horas extra).
+  </p>
+  <p class="mb-0" *ngIf="esSalidaTemprana">Salida temprana.</p>
+  <p class="mb-0" *ngIf="esAtraso">Atraso.</p>
+  <p class="mb-0" *ngIf="esFalta">Falta.</p>
+  <p class="mb-0" *ngIf="sinSalida">No haber registrado su hora de salida.</p>
+  <p class="mb-0" *ngIf="diaExtra">Trabajar un día extra.</p>
+</div>
+
+<div class="card mt-2" *ngIf="data.asistencia">
+  <div class="card-header">Detalles de Registro</div>
+  <div class="container">
+    <ul class="list-group">
+      <div class="row text-center">
+        <div class="col-3">
+          <div class="row">
+            <li class="list-group-item">
+              Usuario:
+              <h4>{{ data.usuario }}</h4>
+            </li>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="row">
+            <li class="list-group-item">
+              Fecha de Registro:
+              <h4>
+                {{ timeConverter(data.hora[0]["seconds"], 1) }}
+              </h4>
+            </li>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="row">
+            <li class="list-group-item">
+              Asistencia:
+              <h4>{{ data.asistencia }}</h4>
+            </li>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="row">
+            <li class="list-group-item">
+              Temperatura:
+              <h4>{{ data.temperatura }}</h4>
+            </li>
+          </div>
+        </div>
+        <li
+          class="list-group-item"
+          *ngFor="let item of data.hora; let i = index"
+          [attr.data-index]="i"
+        >
+          <ng-container *ngIf="i % 2 == 0; else horaRegistro">
+            Hora de Entrada:
+          </ng-container>
+          <ng-template #horaRegistro>Hora de Salida:</ng-template>
+          <h4>{{ timeConverter(data.hora[i]["seconds"], 2) }}</h4>
+        </li>
+      </div>
+      <div class="row text-center">
+        <div class="col-6">
+          <div class="row">
+            <li class="list-group-item text-center">
+              Horas Trabajadas:
+              <h4>{{ data.horasTrabajadas }}</h4>
+            </li>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="row">
+            <li class="list-group-item text-center">
+              Horas Extra:
+              <h4>{{ data.horasExtra }}</h4>
+            </li>
+          </div>
+        </div>
+      </div>
+    </ul>
+  </div>
+</div>
+
+<div
+  *ngIf="
+    esHorasExtra ||
+    esSalidaTemprana ||
+    esAtraso ||
+    esFalta ||
+    sinSalida ||
+    diaExtra
+  "
+>
+  <button
+    type="button"
+    class="btn btn-outline-warning m-1 d-print-none"
+    (click)="goOnEditJustification()"
+  >
+    Justificar
+  </button>
+</div>
+
+<div *ngFor="let item of just">
+  <div class="card mt-2" *ngIf="item.idRegistro == data.id">
+    <div class="card-header">Justificación:</div>
+    <div class="container">
+      <ul class="list-group">
+        <div class="row text-center">
+          <div class="col-6">
+            <div class="row">
+              <li class="list-group-item">
+                Estado:
+                <h4>{{ item.status }}</h4>
+              </li>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <li class="list-group-item">
+                Tipo:
+                <h4>{{ item.tipo }}</h4>
+              </li>
+            </div>
+          </div>
+        </div>
+        <div class="row text-center">
+          <div class="col-6">
+            <div class="row">
+              <li class="list-group-item">
+                Motivo:
+                <h4>{{ item.mensaje }}</h4>
+              </li>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <li class="list-group-item" *ngIf="item.tipo == 'HORAS_EXTRA'">
+                Horas Extra Justificadas:
+                <h4>{{ item.horaJustificada }}</h4>
+              </li>
+              <li
+                class="list-group-item"
+                *ngIf="item.tipo != 'HORAS_EXTRA' && item.tipo != 'ATRASO'"
+              >
+                Horas Trabajadas Justificadas:
+                <h4>{{ item.horaJustificada }}</h4>
+              </li>
+            </div>
+          </div>
+        </div>
+        <div class="row text-center" *ngIf="item.urlLink != ''">
+          <div class="col-12">
+            <div class="row">
+              <li class="list-group-item">
+                Archivo:
+                <a href="{{ item.urlLink }}" target="_blank">Ver </a>
+              </li>
+            </div>
+          </div>
+        </div>
+      </ul>
+      <div *ngIf="isAdmin && item.idUsuario != currentUserId">
+        <button
+          type="button"
+          class="btn btn-outline-warning m-1"
+          (click)="onClick(contenido, item)"
+          *ngIf="item.status != 'ACEPTADO'"
+        >
+          Aceptar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-outline-warning m-1"
+          (click)="onReject(item)"
+          *ngIf="item.status != 'RECHAZADO'"
+        >
+          Rechazar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<button
+  type="button"
+  class="btn btn-outline-warning m-1 d-print-none"
+  (click)="goBack()"
+>
+  Atrás
+</button>
+
+<ng-template #contenido let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">{{ mensaje }}</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body form-group">
+    <p>Ingresar la cantidad de tiempo a registrar:</p>
+    <p>HORAS REGISTRADAS:</p>
+    <h2>{{ horaExtra }}</h2>
+    <div class="form-group col-md-6 form-floating">
+      <input
+        type="time"
+        id="floatingInput"
+        class="form-control"
+        [(ngModel)]="tiempo"
+      />
+      <label for="floatingInput">Hora de Entrada</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="print()">
+      ACEPTAR
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>

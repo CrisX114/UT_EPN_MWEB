@@ -1,0 +1,79 @@
+<nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+  <div class="container container-fluid">
+    <div class="d-flex">
+      <a class="navbar-brand m-2">Sistema de Control de Asistencia</a>
+      <div>
+        <button
+          *ngIf="isLogged"
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarColor01"
+          aria-controls="navbarColor01"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </div>
+    <ng-container *ngIf="isLogged">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarColor01">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-target=".navbar-collapse.show"
+                routerLinkActive="active"
+                [routerLink]="['/data']"
+                >Registros
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                routerLinkActive="active"
+                data-bs-target=".navbar-collapse.show"
+                [routerLink]="['/justific']"
+                >Justificaciones</a
+              >
+            </li>
+            <ng-container *ngIf="isAdmin">
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  routerLinkActive="active"
+                  data-bs-target=".navbar-collapse.show"
+                  [routerLink]="['/g-users']"
+                  >Usuarios</a
+                >
+              </li>
+            </ng-container>
+            <li class="nav-item d-flex">
+              <a
+                class="nav-link"
+                routerLinkActive="active"
+                data-bs-target=".navbar-collapse.show"
+                [routerLink]="['/preferences']"
+                >Preferencias del Sistema</a
+              >
+            </li>
+          </ul>
+          <form action="" class="d-flex">
+            <a class="nav-link text-white">{{ currentUser }} </a>
+          </form>
+          &nbsp;
+          <form class="d-flex">
+            <a
+              class="form-control me-sm-1"
+              (click)="onLogout()"
+              [routerLink]="['/']"
+              >Cerrar sesion</a
+            >
+          </form>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</nav>

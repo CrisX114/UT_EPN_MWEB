@@ -1,0 +1,82 @@
+<div *ngIf="preferences && user">
+  <button
+    type="button"
+    class="btn btn-success btn-lg m-1"
+    (click)="onGoToNew()"
+    [disabled]="preferences.puedeCrear"
+  >
+    Crear Nuevo Usuario
+  </button>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Nombres</th>
+          <th scope="col">Correo Electrónico</th>
+          <th scope="col">Rol de Usuario</th>
+          <th class="d-none d-sm-block" scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="table-info" *ngFor="let item of user">
+          <th scope="row">{{ item.name }}</th>
+          <td>{{ item.email }}</td>
+          <td>{{ item.role }}</td>
+          <td class="bnt-group d-none d-sm-block" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-warning m-1"
+              (click)="onGoToSee(item)"
+            >
+              Detalles
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-warning m-1"
+              (click)="onGoToEdit(item)"
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-danger m-1"
+              (click)="onClickModal(contents, item)"
+              [disabled]="
+                preferences.puedeEliminar || preferences.idHuellaAccion != 0
+              "
+              *ngIf="preferences.emailAdmin != item.email"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<ng-template #contents let-modal>
+  <div class="modal-header">
+    <h4 class="modal-tittle">ELIMINAR USUARIO</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro/a de eliminar este usuario?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="onGoToDelete()">
+      SI
+    </button>
+    <button type="button" class="btn btn-primary" (click)="modal.dismiss()">
+      NO
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>

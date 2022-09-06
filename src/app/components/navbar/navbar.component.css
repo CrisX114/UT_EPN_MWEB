@@ -1,0 +1,11 @@
+.container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+}
+#bloc1 {
+  width: 90%;
+}
+.navbar-brand {
+  font-size: larger;
+}
