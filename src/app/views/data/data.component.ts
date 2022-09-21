@@ -1,15 +1,15 @@
-import { PreferenceService } from './../../components/services/preference.service';
-import { Preference } from './../../models/preference.interface';
 import { AuthService } from 'src/app/components/services/auth.service';
+import { DataService } from '../../components/services/data.service';
+import { JustificationService } from '../../components/services/justification.service';
+import { PreferenceService } from './../../components/services/preference.service';
+import { UserService } from '../../components/services/user.service';
 import { Data } from '../../models/data.interface';
 import { DataMes } from '../../models/datames.interface';
+import { Preference } from './../../models/preference.interface';
+import { User } from '../../models/user.interface';
 import { Justification } from '../../models/justification.interface';
-import { JustificationService } from '../../components/services/justification.service';
-import { DataService } from '../../components/services/data.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { UserService } from '../../components/services/user.service';
-import { User } from '../../models/user.interface';
 import { Subscription } from 'rxjs';
 import { TimeConverter } from '../../components/class/time-converter';
 
@@ -157,47 +157,36 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
   }
 
   setHorasExtra() {
-    let horaExtra: any;
     this.data.forEach((item) => {
       if (!item.horasExtra) {
-        horaExtra = '00:00:00';
-        item.horasExtra = horaExtra;
-        if (item.hora[1]) {
-          this.user?.forEach((itemUser) => {
-            if (item.idUsuario == itemUser.uid) {
-              if (itemUser.horasDeTrabajo != '00:00') {
-                if (
-                  this.compareH(
-                    item.horasTrabajadas,
-                    this.addHoras(
-                      itemUser.horasDeTrabajo + ':00',
-                      '00:' + this.pref.toleranciaOut + ':00'
-                    )
-                  ) > 0
-                ) {
-                  horaExtra = this.subtractHoras(
-                    item.horasTrabajadas,
-                    itemUser.horasDeTrabajo + ':00'
-                  );
-                  item.horasExtra = horaExtra;
-                }
-                if (
-                  this.compareH(
-                    item.horasTrabajadas,
-                    this.subtractHoras(
-                      itemUser.horasDeTrabajo + ':00',
-                      '00:' + this.pref.toleranciaIn + ':00'
-                    )
-                  ) < 0 &&
-                  item.asistencia[0] != 'DIA EXTRA'
-                ) {
-                  item.asistencia.push('SALIDA TEMPRANA');
-                }
-              } else {
-                item.horasExtra = horaExtra;
-              }
-            }
-          });
+        item.horasExtra = '00:00:00';
+        if (item.hora[1] && item.horario != '00:00') {
+          if (
+            this.compareH(
+              item.horasTrabajadas,
+              this.addHoras(
+                item.horario + ':00',
+                '00:' + this.pref.toleranciaOut + ':00'
+              )
+            ) > 0
+          ) {
+            item.horasExtra = this.subtractHoras(
+              item.horasTrabajadas,
+              item.horario + ':00'
+            );
+          }
+          if (
+            this.compareH(
+              item.horasTrabajadas,
+              this.subtractHoras(
+                item.horario + ':00',
+                '00:' + this.pref.toleranciaIn + ':00'
+              )
+            ) < 0 &&
+            item.asistencia[0] != 'DIA EXTRA'
+          ) {
+            item.asistencia.push('SALIDA TEMPRANA');
+          }
         }
       }
     });
@@ -205,9 +194,7 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
 
   setHorasTrabajadas() {
     const tiempoActual = (Date.now() / 1000).toFixed();
-    let hora: string;
     this.data?.forEach((item) => {
-      hora = '00:00:00';
       if (
         this.timeConverter(tiempoActual, 1) ==
           this.timeConverter(item.hora[0]['seconds'], 1) &&
@@ -215,8 +202,7 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
         item.asistencia[0] != 'FALTA'
       ) {
         var seconds = parseInt(tiempoActual) - item.hora[0]['seconds'] + 18000;
-        hora = this.timeConverter(seconds, 2);
-        item.horasTrabajadas = hora;
+        item.horasTrabajadas = this.timeConverter(seconds, 2);
       }
       if (
         this.timeConverter(tiempoActual, 1) !=
@@ -237,22 +223,23 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
         var existe: boolean;
         this.dataMes = [];
         let idUsuarios = [];
-        let fechaGuardando;
+        let fechaGuardando: string;
         this.data?.forEach((data: Data) => {
           temp = {
             fecha: '',
             idUsuario: '',
-            data: [],
-            horasTrabajadas: '',
-            horasExtra: '',
             usuario: '',
+            data: [],
+            horasTrabajadas: '00:00:00',
+            horasExtra: '00:00:00',
+            horasTotalesTrabajo: '00:00:00',
+            horasDiaExtra: '00:00:00',
+            horasExtraJustificadas: '00:00:00',
             numAtrasos: 0,
             numFaltas: 0,
             numSalidasTempranas: 0,
             numSinSalidas: 0,
-            horario: '0',
-            horasTotalesTrabajo: '0',
-            horasExtraJustificadas: '',
+            numDiaExtra: 0,
           };
           existe = false;
           const fechaD = this.timeConverter(data.hora[0]['seconds'], 1).split(
@@ -269,33 +256,22 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
             }
           });
           if (!existe) {
-            this.user?.forEach((user) => {
-              if (user.uid == data.idUsuario) {
-                temp.horario = user.horasDeTrabajo;
-              }
-            });
             idUsuarios.push(data.idUsuario);
             temp.usuario = data.usuario;
             temp.fecha = fechaGuardando;
             temp.idUsuario = data.idUsuario;
-            temp.horasTrabajadas = '00:00:00';
-            temp.horasTotalesTrabajo = '00:00:00';
-            temp.horasExtra = '00:00:00';
-            temp.horasExtraJustificadas = '00:00:00';
-            temp.numAtrasos = 0;
-            temp.numFaltas = 0;
-            temp.numSalidasTempranas = 0;
-            temp.numSinSalidas = 0;
             this.dataMes.push(temp);
           }
+
           this.dataMes?.forEach((datames) => {
             if (
               datames.fecha == fechaGuardando &&
               datames.idUsuario == data.idUsuario
             ) {
               datames.data.push(data);
-              if (datames.horario != '00:00') {
-                if (data.asistencia.indexOf('ATRASO') >= 0) {
+              if (data.horario != '00:00') {
+                //cambio
+                if (data.asistencia?.indexOf('ATRASO') >= 0) {
                   datames.numAtrasos++;
                 }
                 if (data.asistencia.indexOf('SIN SALIDA') >= 0) {
@@ -306,33 +282,31 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
                 }
                 if (data.asistencia[0] != 'DIA EXTRA') {
                   if (
-                    this.compareH(
-                      data.horasTrabajadas,
-                      datames.horario + ':00'
-                    ) >= 0 ||
+                    this.compareH(data.horasTrabajadas, data.horario + ':00') >=
+                      0 ||
                     this.compareH(
                       this.addHoras(
                         '00:' + this.pref.toleranciaIn + ':00',
                         data.horasTrabajadas
                       ),
-                      datames.horario + ':00'
+                      data.horario + ':00'
                     ) >= 0
                   ) {
                     datames.horasTrabajadas = this.addHoras(
                       datames.horasTrabajadas,
-                      datames.horario + ':00'
+                      data.horario + ':00'
                     );
                     if (
                       this.compareH(
                         data.horasTrabajadas,
-                        datames.horario + ':00'
+                        data.horario + ':00'
                       ) >= 0
                     ) {
                       datames.horasExtra = this.addHoras(
                         datames.horasExtra,
                         this.subtractHoras(
                           data.horasTrabajadas,
-                          datames.horario + ':00'
+                          data.horario + ':00'
                         )
                       );
                     }
@@ -379,6 +353,8 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
                       }
                     }
                   }
+                } else {
+                  datames.numDiaExtra++;
                 }
               } else {
                 datames.horasTrabajadas = this.addHoras(
@@ -388,8 +364,10 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
               }
               datames.horasTotalesTrabajo = this.addHoras(
                 datames.horasTotalesTrabajo,
-                datames.horario + ':00'
+                data.horario + ':00'
               );
+              if (data.asistencia[0] != 'DIA EXTRA') {
+              }
               //gestion de justificaciones
               data.justificaciones?.forEach((justificacion) => {
                 const justific = this.just.filter(
@@ -400,8 +378,8 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
                     justific[0].tipo == 'DIA_EXTRA' &&
                     justific[0].status == 'ACEPTADO'
                   ) {
-                    datames.horasExtraJustificadas = this.addHoras(
-                      datames.horasExtraJustificadas,
+                    datames.horasDiaExtra = this.addHoras(
+                      datames.horasDiaExtra,
                       justific[0].horaJustificada
                     ).toString();
                   }
@@ -446,7 +424,9 @@ export class DataComponent extends TimeConverter implements OnInit, OnDestroy {
           });
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
     return this.dataMes;
   }
 

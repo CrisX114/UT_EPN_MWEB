@@ -9,9 +9,10 @@ export interface DataMes {
   horasTotalesTrabajo: string;
   horasExtra: string;
   horasExtraJustificadas: string;
+  horasDiaExtra: string;
   numAtrasos: number;
   numFaltas: number;
   numSalidasTempranas: number;
+  numDiaExtra: number;
   numSinSalidas: number;
-  horario: string;
 }

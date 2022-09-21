@@ -29,17 +29,19 @@
           </thead>
         </table>
       </div>
-      <li
-        class="list-group-item"
-        *ngFor="let item of data.hora; let i = index"
-        [attr.data-index]="i"
-      >
-        <ng-container *ngIf="i % 2 == 0; else horaRegistro">
-          Hora de Entrada:
-        </ng-container>
-        <ng-template #horaRegistro>Hora de Salida:</ng-template>
-        <h4>{{ timeConverter(data.hora[i]["seconds"], 2) }}</h4>
-      </li>
+      <ng-container *ngIf="data.asistencia[0] != 'FALTA'">
+        <li
+          class="list-group-item"
+          *ngFor="let item of data.hora; let i = index"
+          [attr.data-index]="i"
+        >
+          <ng-container *ngIf="i % 2 == 0; else horaRegistro">
+            Hora de Entrada:
+          </ng-container>
+          <ng-template #horaRegistro>Hora de Salida:</ng-template>
+          <h4>{{ timeConverter(data.hora[i]["seconds"], 2) }}</h4>
+        </li>
+      </ng-container>
       <div class="">
         <table class="table table-hover table-bordered">
           <thead>

@@ -1,18 +1,19 @@
 <div class="form-group">
-  <div class="form-floating m-2" *ngIf="isAdmin">
+  <div class="form-floating m-1 d-print-none" *ngIf="isAdmin">
     <input
       type="text"
       class="form-control"
-      id="floatingInput"
       name="filter1"
+      id="floatingInput"
       placeholder="Buscar por Nombre..."
       [(ngModel)]="filter1"
+      *ngIf="true"
     />
-    <label for="floatingInput">Buscar por Nombre...</label>
+    <label for="floatingInput">Nombre</label>
   </div>
   <div class="input-group">
-    <div class="col-md-6">
-      <div class="form-floating m-2 d-print-none">
+    <div class="col">
+      <div class="form-floating m-1 d-print-none">
         <input
           type="text"
           id="floatingInput"
@@ -21,20 +22,20 @@
           placeholder="Buscar por Fecha..."
           [(ngModel)]="filter2"
         />
-        <label for="floatingInput">Buscar por Fecha...</label>
+        <label for="floatingInput">Fecha</label>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="form-floating m-2 d-print-none">
+    <div class="col" *ngIf="selected != '3'">
+      <div class="form-floating m-1 d-print-none">
         <input
           type="text"
           id="floatingInput"
           class="form-control"
           name="filter3"
-          placeholder="Buscar por tipo de justificación..."
+          placeholder="Buscar por estado Asistencia..."
           [(ngModel)]="filter3"
         />
-        <label for="floatingInput">Buscar por tipo de justificación...</label>
+        <label for="floatingInput">Asistencia</label>
       </div>
     </div>
   </div>
@@ -82,6 +83,7 @@
     <label class="form-check-label" for="inlineRadio3">RECHAZADOS</label>
   </div>
 </div>
+
 <div class="container">
   <div class="row d-flex justify-content-center">
     <div
@@ -103,7 +105,7 @@
               Nombre: {{ item.usuario }}
             </li>
             <li class="list-group-item bg-light">
-              Fecha: {{ timeConverter(item.fecha["seconds"], 1) }}
+              Fecha: {{ this.timeConverter(item.fecha["seconds"], 1) }}
             </li>
             <li class="list-group-item bg-light">Tipo: {{ item.tipo }}</li>
             <li class="list-group-item bg-light" style="height: 2cm">
@@ -143,11 +145,9 @@
   </div>
 </div>
 
-<!-- Modales -->
-
 <ng-template #setHours let-modal>
   <div class="modal-header">
-    <h4 class="modal-tittle">{{ mensaje }}</h4>
+    <h4 class="modal-tittle">{{ message }}</h4>
     <button
       class="close"
       aria-label="close"
@@ -159,7 +159,7 @@
   </div>
 
   <div class="modal-body">
-    <p>Ingresar la cantidad de tiempo a registrar</p>
+    <p>Ingresar la cantidad de tiempo a registrar:</p>
     <p>HORAS REGISTRADAS:</p>
     <h2>{{ horaExtra }}</h2>
     <div class="form-group col-md-6 form-floating">

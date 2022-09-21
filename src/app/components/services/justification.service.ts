@@ -30,8 +30,10 @@ export class JustificationService {
     private readonly afs: AngularFirestore,
     private dataSvc: DataService
   ) {
-    this.justificationsCollection =
-      this.afs.collection<Justification>('justificaciones');
+    this.justificationsCollection = this.afs.collection<Justification>(
+      'justificaciones',
+      (ref) => ref.orderBy('fecha', 'desc')
+    );
   }
 
   //función para editar el campo "horaJustificada"

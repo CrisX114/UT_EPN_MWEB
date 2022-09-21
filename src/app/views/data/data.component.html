@@ -93,7 +93,7 @@
           <table class="table table-hover table-bordered">
             <thead>
               <tr>
-                <th scope="col" class="text-center">Nombre</th>
+                <th scope="col" class="col-md-4 text-center">Nombre</th>
                 <th scope="col" class="text-center">Fecha</th>
                 <th scope="col" class="text-center">Asistencia</th>
                 <th scope="col" class="text-center d-print-none">Acciones</th>
@@ -111,7 +111,9 @@
                 "
               >
                 <ng-container *ngIf="item.usuario == currentUser || isAdmin">
-                  <th scope="row">{{ item.usuario }}</th>
+                  <th scope="row" class="text-center">
+                    {{ item.usuario }}
+                  </th>
                   <td class="text-center">
                     {{ timeConverter(item.hora[0]["seconds"], 1) }}
                   </td>
@@ -181,7 +183,7 @@
         <table class="table table-hover table-bordered">
           <thead>
             <tr>
-              <th scope="col" class="text-center">Nombre</th>
+              <th scope="col" class="col-md-2 text-center">Nombre</th>
               <th scope="col" class="text-center">Fecha</th>
               <th scope="col" class="text-center">Asistencia</th>
               <th scope="col" class="text-center">Hora de Entrada</th>
@@ -192,7 +194,9 @@
               <th scope="col" class="text-center d-print-none">
                 Justificación
               </th>
-              <th scope="col" class="text-center d-print-none">Acciones</th>
+              <th scope="col" class="col-md-1 text-center d-print-none">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -263,6 +267,9 @@
                 </ng-template>
                 <td class="text-center">
                   {{ item.horasTrabajadas }}
+                  <ng-container *ngIf="item.horario != '00:00'">
+                    / {{ item.horario }}:00
+                  </ng-container>
                 </td>
                 <td class="text-center">
                   <ng-container
@@ -403,96 +410,140 @@
           </button>
         </ng-container>
       </div>
-      <div class="table-responsive" *ngIf="selected == '3'">
-        <table class="table table-hover table-bordered">
-          <thead>
-            <tr>
-              <th scope="col" class="text-center">Nombre</th>
-              <th scope="col" class="text-center">Fecha</th>
-              <th scope="col" class="text-center"># Atrasos</th>
-              <th scope="col" class="text-center"># Salidas Tempranas</th>
-              <th scope="col" class="text-center"># Sin Salidas</th>
-              <th scope="col" class="text-center"># Faltas</th>
-              <th scope="col" class="text-center"># Registros</th>
-              <th scope="col" class="text-center">Horas Trabajadas</th>
-              <th scope="col" class="text-center">Horas Extra</th>
-              <th scope="col" class="text-center">Horas Extra Aprobadas</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              class="table-info"
-              *ngFor="
-                let item of dataMes
-                  | filterUser: filter1
-                  | filterDate: filter2
-                  | pagination: page
-              "
-            >
-              <ng-container *ngIf="item.idUsuario == currentUserId || isAdmin">
-                <th scope="row" class="text-center">{{ item.usuario }}</th>
-                <td class="text-center">{{ item.fecha }}</td>
-                <td class="text-center">
-                  {{ item.numAtrasos }}
-                </td>
-                <td class="text-center">
-                  {{ item.numSalidasTempranas }}
-                </td>
-                <td class="text-center">
-                  {{ item.numSinSalidas }}
-                </td>
-                <td class="text-center">
-                  {{ item.numFaltas }}
-                </td>
-                <td class="text-center">
-                  {{ item.data.length }}
-                </td>
-                <td class="text-center">
-                  {{ item.horasTrabajadas }}
-                  <ng-container *ngIf="item.horario != '00:00'">
-                    / {{ item.horasTotalesTrabajo }}
-                  </ng-container>
-                </td>
-                <td class="text-center">{{ item.horasExtra }}</td>
-                <td class="text-center">
-                  {{ item.horasExtraJustificadas }}
-                </td>
+
+      <div class="container" *ngIf="selected == '3'">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col" class="col-md-2 text-center">Nombre</th>
+                    <th scope="col" class="col text-center">Fecha</th>
+                    <th scope="col" class="col text-center"># Atrasos</th>
+                    <th scope="col" class="col text-center">
+                      # Salidas Tempranas
+                    </th>
+                    <th scope="col" class="col text-center"># Sin Salidas</th>
+                    <th scope="col" class="col text-center"># Faltas</th>
+                    <th scope="col" class="col text-center"># Días Extras</th>
+                    <th scope="col" class="col text-center"># Registros</th>
+                    <th scope="col" class="col text-center">
+                      Horas Trabajadas
+                    </th>
+                    <th scope="col" class="col text-center">
+                      Horas Extra Justif./Total
+                    </th>
+                    <th scope="col" class="col text-center">Horas Día Extra</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="table-info"
+                    *ngFor="
+                      let item of dataMes
+                        | filterUser: filter1
+                        | filterDate: filter2
+                        | pagination: page
+                    "
+                  >
+                    <ng-container
+                      *ngIf="item.idUsuario == currentUserId || isAdmin"
+                    >
+                      <th scope="row" class="text-center">
+                        {{ item.usuario }}
+                      </th>
+                      <td class="text-center">{{ item.fecha }}</td>
+                      <td class="text-center">
+                        {{ item.numAtrasos }}
+                      </td>
+                      <td class="text-center">
+                        {{ item.numSalidasTempranas }}
+                      </td>
+                      <td class="text-center">
+                        {{ item.numSinSalidas }}
+                      </td>
+                      <td class="text-center">
+                        {{ item.numFaltas }}
+                      </td>
+                      <td class="text-center">
+                        {{ item.numDiaExtra }}
+                      </td>
+                      <td class="text-center">
+                        {{ item.data.length }}
+                      </td>
+                      <td class="text-center">
+                        {{ item.horasTrabajadas }}
+                        <ng-container *ngIf="item.horario != '00:00'">
+                          / {{ item.horasTotalesTrabajo }}
+                        </ng-container>
+                      </td>
+                      <td class="text-center">
+                        <ng-container
+                          *ngIf="item.horasExtra != '00:00:00'; else noData"
+                        >
+                          {{ item.horasExtraJustificadas }} /
+                          {{ item.horasExtra }}
+                        </ng-container>
+                      </td>
+
+                      <td class="text-center">
+                        <ng-container
+                          *ngIf="
+                            item.horasExtraJustificadas != '00:00:00';
+                            else noData
+                          "
+                        >
+                          {{ item.horasExtraJustificadas }}
+                        </ng-container>
+                      </td>
+                    </ng-container>
+                  </tr>
+                </tbody>
+              </table>
+              <ng-container
+                *ngIf="
+                  data
+                    | filterUser: filter1
+                    | filterDate: filter2
+                    | pagination: page
+                "
+              >
+                <button
+                  class="btn btn-primary d-print-none m-2"
+                  (click)="prevPage()"
+                  [disabled]="page == 0"
+                >
+                  Anteriores
+                </button>
+                <button
+                  class="btn btn-primary d-print-none m-2"
+                  (click)="nextPage()"
+                  [disabled]="
+                    (
+                      dataMes
+                      | filterUser: filter1
+                      | filterDate: filter2
+                      | pagination: page
+                    ).length < numPerPage
+                  "
+                >
+                  Siguiente
+                </button>
+                &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+                <button
+                  class="btn btn-primary d-print-none m-2"
+                  (click)="print()"
+                >
+                  Imprimir
+                </button>
               </ng-container>
-            </tr>
-          </tbody>
-        </table>
-        <ng-container
-          *ngIf="
-            data | filterUser: filter1 | filterDate: filter2 | pagination: page
-          "
-        >
-          <button
-            class="btn btn-primary d-print-none m-2"
-            (click)="prevPage()"
-            [disabled]="page == 0"
-          >
-            Anteriores
-          </button>
-          <button
-            class="btn btn-primary d-print-none m-2"
-            (click)="nextPage()"
-            [disabled]="
-              (
-                dataMes
-                | filterUser: filter1
-                | filterDate: filter2
-                | pagination: page
-              ).length < numPerPage
-            "
-          >
-            Siguiente
-          </button>
-          &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
-          <button class="btn btn-primary d-print-none m-2" (click)="print()">
-            Imprimir
-          </button>
-        </ng-container>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #noData> --- </ng-template>
