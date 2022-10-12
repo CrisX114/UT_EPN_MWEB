@@ -489,12 +489,9 @@
 
                       <td class="text-center">
                         <ng-container
-                          *ngIf="
-                            item.horasExtraJustificadas != '00:00:00';
-                            else noData
-                          "
+                          *ngIf="item.horasDiaExtra != '00:00:00'; else noData"
                         >
-                          {{ item.horasExtraJustificadas }}
+                          {{ item.horasDiaExtra }}
                         </ng-container>
                       </td>
                     </ng-container>

@@ -126,7 +126,7 @@
             <button
               type="button"
               class="btn btn-sm btn-outline-warning m-1"
-              (click)="onReject(item, ad)"
+              (click)="onClickModalReject(item, reject)"
               *ngIf="item.status == 'ACEPTADO' || item.status == 'SOLICITADO'"
             >
               Rechazar
@@ -204,4 +204,37 @@
       ACEPTAR
     </button>
   </div>
+</ng-template>
+
+<ng-template #reject let-modal>
+  <div class="modal-header">
+    <h4 class="text-center" class="modal-tittle">{{ mensaje }}</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body form-group">
+    <p>Ingresar motivo de rechazo de la justificación:</p>
+    <div class="form-group col-md-6 form-floating">
+      <input
+        type="text"
+        id="floatingInput"
+        class="form-control"
+        [(ngModel)]="motivoR"
+      />
+      <label for="floatingInput">Motivo de rechazo</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="onReject(ad)">
+      ACEPTAR
+    </button>
+  </div>
+  <div class="modal"></div>
 </ng-template>

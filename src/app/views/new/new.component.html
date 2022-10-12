@@ -1,10 +1,6 @@
 <div *ngIf="preferences" class="container">
   <div class="row justify-content-center">
-    <form
-      class="mt-3 col-md-8"
-      (ngSubmit)="onSave(contents, ad)"
-      [formGroup]="userForm"
-    >
+    <form class="mt-3 col-md-8" [formGroup]="userForm">
       <div class="form-row">
         <div class="form-group m-1 form-floating">
           <input
@@ -135,10 +131,10 @@
         <div class="container">
           <div class="row justify-content-center m-2">
             <button
-              type="submit"
               class="btn bg-dark text-light btn-block"
               [disabled]="!userForm.valid"
               *ngIf="!usuarioGuardado"
+              (click)="onSave(contents, ad)"
             >
               Guardar
             </button>

@@ -21,6 +21,7 @@ export class DetailsJComponent
   horaExtra: String;
   tipo: string;
   tiempo: string;
+  motivoR: string = '';
   mensaje: string;
   isAdmin: boolean;
   flag: boolean;
@@ -112,10 +113,12 @@ export class DetailsJComponent
   }
 
   onClick(contenido: any, item: Justification) {
-    this.tipo = item.tipo;
-    this.getTimeJustification(item);
-    this.modal.open(contenido, { size: 'lg' });
     this.justification = item;
+    if (this.justification.status != 'ACEPTADO') {
+      this.tipo = item.tipo;
+      this.getTimeJustification(item);
+    }
+    this.modal.open(contenido, { size: 'lg' });
   }
 
   getTimeJustification(item: Justification) {
@@ -147,6 +150,7 @@ export class DetailsJComponent
   }
 
   print(contenido: any) {
+    this.justification.motivoR = '';
     this.onAccept(this.justification, this.tiempo, this.flag);
     this.modal.dismissAll(contenido);
   }
@@ -160,9 +164,11 @@ export class DetailsJComponent
 
   //en el caso de que se de click en el botón "Rechazar"
   //su status cambiará a RECHAZADO
-  onReject(item: Justification) {
+  onReject() {
     try {
-      this.justSvc.onReject(item);
+      this.modal.dismissAll();
+      this.justification.motivoR = this.motivoR;
+      this.justSvc.onReject(this.justification);
     } catch (error) {}
   }
 

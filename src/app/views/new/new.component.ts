@@ -69,12 +69,15 @@ export class NewComponent implements OnInit {
       this.modal.open(ad, { size: 'lg' });
     }
   }
+
   onClick(contents: any) {
     try {
       this.initFormPassword();
       this.modal.dismissAll(contents);
       this.modal.open(contents, { size: 'lg' });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   onActivate(contents: any): void {

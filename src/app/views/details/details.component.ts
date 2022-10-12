@@ -53,8 +53,16 @@ export class DetailsComponent implements OnInit {
   //función que se ejecuta cuando se da click en "Borrar".
   async onGoToDelete(): Promise<void> {
     try {
+      if (this.user.idHuella) {
+        this.preferences.idHuellaAccion = this.user.idHuella;
+        this.preferences.puedeEliminar = true;
+      } else {
+        this.preferences.puedeCrear = false;
+      }
+      this.preferenceSvc.onSavePreference(this.preferences);
       await this.userSvc.onDeleteUser(this.user?.uid);
-      alert('Deleted');
+      alert('Eliminado');
+      this.modal.dismissAll();
       this.onGoBackToList();
     } catch (err) {}
   }

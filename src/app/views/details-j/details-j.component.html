@@ -160,12 +160,32 @@
             </div>
           </div>
         </div>
-        <div class="row text-center" *ngIf="item.urlLink != ''">
+        <div
+          class="row text-center"
+          *ngIf="
+            item.urlLink &&
+            item.urlLink != '' &&
+            item.nombreDoc &&
+            item.nombreDoc != ''
+          "
+        >
           <div class="col-12">
             <div class="row">
               <li class="list-group-item">
-                Archivo:
-                <a href="{{ item.urlLink }}" target="_blank">Ver </a>
+                Archivo de Justificación:
+                <a href="{{ item.urlLink }}" target="_blank"
+                  >{{ item.nombreDoc }}
+                </a>
+              </li>
+            </div>
+          </div>
+        </div>
+        <div class="row text-center" *ngIf="item.motivoR && item.motivoR != ''">
+          <div class="col-12">
+            <div class="row">
+              <li class="list-group-item">
+                Motivo de rechazo:
+                <h4 class="text-center">{{ item.motivoR }}</h4>
               </li>
             </div>
           </div>
@@ -184,7 +204,7 @@
         <button
           type="button"
           class="btn btn-outline-warning m-1"
-          (click)="onReject(item)"
+          (click)="onClick(reject, item)"
           *ngIf="item.status != 'RECHAZADO'"
         >
           Rechazar
@@ -230,6 +250,39 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="print()">
+      ACEPTAR
+    </button>
+  </div>
+  <div class="modal"></div>
+</ng-template>
+
+<ng-template #reject let-modal>
+  <div class="modal-header">
+    <h4 class="text-center" class="modal-tittle">{{ mensaje }}</h4>
+    <button
+      class="close"
+      aria-label="close"
+      type="button"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body form-group">
+    <p>Ingresar motivo de rechazo de la justificación:</p>
+    <div class="form-group col-md-6 form-floating">
+      <input
+        type="text"
+        id="floatingInput"
+        class="form-control"
+        [(ngModel)]="motivoR"
+      />
+      <label for="floatingInput">Motivo de rechazo</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="onReject()">
       ACEPTAR
     </button>
   </div>

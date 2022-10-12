@@ -12,6 +12,7 @@ export interface Justification {
   id: string;
   tipo: tipo;
   mensaje: string;
+  motivoR: string;
   status: status;
   idUsuario: string;
   idRegistro: string;
@@ -19,4 +20,5 @@ export interface Justification {
   fecha: any;
   horaJustificada?: string;
   urlLink?: string;
+  nombreDoc?: string;
 }

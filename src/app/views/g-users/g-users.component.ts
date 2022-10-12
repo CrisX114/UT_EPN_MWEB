@@ -52,11 +52,18 @@ export class GUsuariosComponent {
   //función que se ejecuta cuando se da click en "borrar"
   //se envia, al servicio userService, el id del usuario a borrar
   onGoToDelete(): void {
+    if (this.userDelete.idHuella) {
+      this.preferences.idHuellaAccion = this.userDelete.idHuella;
+      this.preferences.puedeEliminar = true;
+    } else {
+      this.preferences.puedeCrear = false;
+    }
+    this.preferenceSvc.onSavePreference(this.preferences);
     this.userSvc.onDeleteUser(this.userDelete.uid);
-    this.preferences.puedeEliminar = true;
-    this.preferences.idHuellaAccion = this.userDelete.idHuella;
     this.userDelete = null;
+    this.modal.dismissAll();
   }
+
   onGoToNew(): void {
     this.router.navigate(['new']);
   }

@@ -28,6 +28,7 @@ export class NewJComponent extends TimeConverter implements OnInit {
   esDiaExtra: boolean = false;
   tipoJust: string;
   sinSalida: boolean;
+  name: string = '';
 
   url: string = '';
   pathFile: string = '';
@@ -74,6 +75,8 @@ export class NewJComponent extends TimeConverter implements OnInit {
 
   async uploadFile() {
     if (this.pathFile != '') {
+      const myArray = this.pathFile.split('/');
+      this.name = myArray[myArray.length - 1];
       this.url = await this.storage.uploadFile(this.pathFile, this.file);
     }
   }
@@ -95,6 +98,7 @@ export class NewJComponent extends TimeConverter implements OnInit {
     this.justForm.patchValue({
       horaJustificada: this.setHorasJustificadas(justificacion),
       urlLink: this.url,
+      nombreDoc: this.name,
     });
     if (this.justForm.valid) {
       const justificacion = this.justForm.value;
